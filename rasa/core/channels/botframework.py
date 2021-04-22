@@ -215,6 +215,9 @@ class BotFrameworkInput(InputChannel):
 
         @botframework_webhook.route("/webhook", methods=["POST"])
         async def webhook(request: Request) -> HTTPResponse:
+            """ The format of an activity object exchanged at this point is
+                described in MS's docs here : https://docs.microsoft.com/en-us/azure/bot-service/rest-api/bot-framework-rest-connector-api-reference?view=azure-bot-service-4.0#activity-object
+            """
             postdata = request.json
             metadata = self.get_metadata(request)
 
@@ -235,12 +238,11 @@ class BotFrameworkInput(InputChannel):
                     text = ""
                     if postdata.get("text"):
                         text = postdata.get("text")
-                    else:
-                        if postdata.get("value"):
-                            raw_value = postdata.get("value")
-                            if "value" in raw_value:
-                                raw_value = raw_value["value"]
-                            text = json.dumps(raw_value)
+                    elif postdata.get("value"):
+                        raw_value = postdata.get("value")
+                        if "value" in raw_value:
+                            raw_value = raw_value["value"]
+                        text = json.dumps(raw_value)
 
                     user_msg = UserMessage(
                         text=text,
